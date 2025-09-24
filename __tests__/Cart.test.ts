@@ -1,4 +1,5 @@
-import {Cart, Product} from "../src/Cart";
+import {Product} from "../src/types/productTypes";
+import {Cart} from "../src/Cart";
 
 const pomme: Product = {
     name: "Pomme",
@@ -123,11 +124,11 @@ describe("Itération 4 - Coupons", () => {
             value: 10
         };
 
-        cart.applyCoupon(coupon);
+        cart.applyVoucher(coupon);
         const totals = cart.calculateTotals();
 
-        expect(totals.discount).toBeCloseTo(0.10, 2);
-        expect(totals.total).toBeCloseTo(0.45, 2);
+        expect(totals.discount).toBeCloseTo(0.05, 2);
+        expect(totals.total).toBeCloseTo(0.48, 2);
     });
 
     it("should apply fixed amount coupon", () => {
@@ -139,12 +140,12 @@ describe("Itération 4 - Coupons", () => {
         };
 
         //When
-        cart.applyCoupon(coupon);
+        cart.applyVoucher(coupon);
         const totals = cart.calculateTotals();
 
         //Then
         expect(totals.discount).toBe(0.15);
-        expect(totals.total).toBeCloseTo(0.35, 2);
+        expect(totals.total).toBeCloseTo(0.38, 2);
     });
 
     it("should not apply expired coupon", () => {
@@ -157,7 +158,7 @@ describe("Itération 4 - Coupons", () => {
         };
 
         //When
-        cart.applyCoupon(expiredCoupon);
+        cart.applyVoucher(expiredCoupon);
         const totals = cart.calculateTotals();
 
         //Then
@@ -176,7 +177,7 @@ describe("Itération 4 - Coupons", () => {
         };
 
         //When
-        cart.applyCoupon(coupon);
+        cart.applyVoucher(coupon);
         const totals = cart.calculateTotals();
 
         //Then

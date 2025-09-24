@@ -1,25 +1,13 @@
+import {CartItem, CartTotals} from "./types/cartTypes";
+import {Product} from "./types/productTypes";
+import {Voucher} from "./types/voucherTypes";
+
+import {calculateDiscount} from "./utils/voucherUtils";
 import {calculateVAT} from "./utils/vatUtils";
-
-export type Product = {
-    name: string,
-    price: number,
-    vatRate: number,
-}
-
-export type CartItem = {
-    product: Product,
-    price: number,
-    quantity: number,
-}
-
-export interface CartTotals {
-    subtotal: number;
-    vat: number;
-    total: number;
-}
 
 export class Cart {
     private items: Map<string, CartItem> = new Map();
+    private appliedCoupon?: Voucher;
 
     add(product: Product, quantity: number): void {
         if (quantity <= 0) {
@@ -59,6 +47,10 @@ export class Cart {
         this.items.delete(productName);
     }
 
+    applyVoucher(voucher:  Voucher): void {
+        this.appliedCoupon = voucher;
+    }
+
     calculateTotals(): CartTotals {
         const items = this.getItems();
         let subtotal = 0;
@@ -72,11 +64,13 @@ export class Cart {
             vat += itemVat;
         }
 
-        const total = subtotal + vat;
+        const discount = this.appliedCoupon ? calculateDiscount(this.appliedCoupon, subtotal) : 0;
+        const total = subtotal + vat - discount;
 
         return {
             subtotal: Math.round(subtotal * 100) / 100,
             vat: Math.round(vat * 100) / 100,
+            discount: Math.round(discount * 100) / 100,
             total: Math.round(total * 100) / 100
         };
     }
