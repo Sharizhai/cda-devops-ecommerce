@@ -3,11 +3,13 @@ import {Cart, Product} from "../src/Cart";
 const pomme: Product = {
     name: "Pomme",
     price: 0.50,
+    vatRate: 0.05
 };
 
 const poire: Product = {
     name: "Poire",
     price: 0.80,
+    vatRate: 0.06
 };
 
 let cart: Cart;
@@ -61,13 +63,13 @@ describe("Itération 2 - Update/Remove", () => {
 
         const items = cart.getItems();
         const item1 = items.find(item => item.product.name === "Pomme");
+
         expect(item1?.quantity).toBe(5);
     });
 
     it("should remove product when quantity is 0", () => {
         cart.updateQuantity("Pomme", 0);
 
-        // Then
         expect(cart.getItems()).toHaveLength(1);
         expect(cart.getItems()[0].product.name).toBe("Poire");
     });
@@ -85,5 +87,26 @@ describe("Itération 2 - Update/Remove", () => {
 
     it("should throw error for negative quantity", () => {
         expect(() => cart.updateQuantity("Pomme", -1)).toThrow("Quantity cannot be negative");
+    });
+});
+
+describe('Itération 3 - Totals & VAT', () => {
+    it('should return zero totals for empty cart', () => {
+        const totals = cart.calculateTotals();
+
+        expect(totals.subtotal).toBe(0);
+        expect(totals.vat).toBe(0);
+        expect(totals.total).toBe(0);
+    });
+
+    it('should calculate totals correctly', () => {
+        cart.add(pomme, 1);
+        cart.add(poire, 2);
+
+        const totals = cart.calculateTotals();
+
+        expect(totals.subtotal).toBeCloseTo(2.10, 2);
+        expect(totals.vat).toBeCloseTo(0.121, 2);
+        expect(totals.total).toBeCloseTo(2.221, 2);
     });
 });
