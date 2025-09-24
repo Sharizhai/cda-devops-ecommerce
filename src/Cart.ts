@@ -8,6 +8,7 @@ import {calculateVAT} from "./utils/vatUtils";
 export class Cart {
     private items: Map<string, CartItem> = new Map();
     private appliedCoupon?: Voucher;
+    private recalculateTimer?: NodeJS.Timeout;
 
     add(product: Product, quantity: number): void {
         if (quantity <= 0) {
@@ -25,6 +26,8 @@ export class Cart {
                 price: product.price
             });
         }
+
+        this.debouncedRecalculate();
     }
 
     updateQuantity(productName: string, quantity: number): void {
@@ -37,6 +40,8 @@ export class Cart {
         if (quantity === 0) this.items.delete(productName);
 
         item.quantity = quantity;
+
+        this.debouncedRecalculate();
     }
 
     remove(productName: string): void {
@@ -45,6 +50,7 @@ export class Cart {
         if (!item) throw new Error("Product not found in cart");
 
         this.items.delete(productName);
+        this.debouncedRecalculate();
     }
 
     applyVoucher(voucher:  Voucher): void {
@@ -73,6 +79,18 @@ export class Cart {
             discount: Math.round(discount * 100) / 100,
             total: Math.round(total * 100) / 100
         };
+    }
+
+    private debouncedRecalculate(): void {
+        this.clearRecalculateTimer();
+        this.recalculateTimer = setTimeout(() => {}, 200);
+    }
+
+    private clearRecalculateTimer(): void {
+        if (this.recalculateTimer) {
+            clearTimeout(this.recalculateTimer);
+            this.recalculateTimer = undefined;
+        }
     }
 
     clear(): void {

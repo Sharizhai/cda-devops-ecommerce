@@ -185,7 +185,7 @@ describe("Itération 4 - Coupons", () => {
     });
 });
 
-describe("Itération 7 - Timers debounce", () => {
+describe("Itération 6 - Timers debounce", () => {
     beforeEach(() => {
         jest.useFakeTimers();
     });
