@@ -1,4 +1,5 @@
 import {Product} from "./productTypes";
+import {Voucher} from "./voucherTypes";
 
 export interface CartItem {
     product: Product,
@@ -11,4 +12,12 @@ export interface CartTotals {
     vat: number;
     discount?: number;
     total: number;
+}
+
+export interface Order {
+    id: string;
+    items: CartItem[];
+    totals: CartTotals;
+    voucher?: Voucher;
+    timestamp: Date;
 }

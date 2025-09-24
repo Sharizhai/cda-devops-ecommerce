@@ -75,6 +75,11 @@ export class Cart {
         };
     }
 
+    clear(): void {
+        this.items.clear();
+        this.appliedCoupon = undefined;
+    }
+
     getItems(): CartItem[] {
         return Array.from(this.items.values());
     }
