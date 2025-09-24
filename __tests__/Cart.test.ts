@@ -184,3 +184,24 @@ describe("Itération 4 - Coupons", () => {
         expect(totals.discount).toBe(0);
     });
 });
+
+describe("Itération 7 - Timers debounce", () => {
+    beforeEach(() => {
+        jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    it("should debounce recalculation", () => {
+        cart.add(pomme, 1);
+        cart.add(poire, 1);
+        cart.updateQuantity("Pomme", 3);
+
+        expect(jest.getTimerCount()).toBe(1);
+
+        jest.advanceTimersByTime(200);
+        expect(jest.getTimerCount()).toBe(0);
+    });
+});
