@@ -90,8 +90,8 @@ describe("Itération 2 - Update/Remove", () => {
     });
 });
 
-describe('Itération 3 - Totals & VAT', () => {
-    it('should return zero totals for empty cart', () => {
+describe("Itération 3 - Totals & VAT", () => {
+    it("should return zero totals for empty cart", () => {
         const totals = cart.calculateTotals();
 
         expect(totals.subtotal).toBe(0);
@@ -99,7 +99,7 @@ describe('Itération 3 - Totals & VAT', () => {
         expect(totals.total).toBe(0);
     });
 
-    it('should calculate totals correctly', () => {
+    it("should calculate totals correctly", () => {
         cart.add(pomme, 1);
         cart.add(poire, 2);
 
@@ -108,5 +108,78 @@ describe('Itération 3 - Totals & VAT', () => {
         expect(totals.subtotal).toBeCloseTo(2.10, 2);
         expect(totals.vat).toBeCloseTo(0.121, 2);
         expect(totals.total).toBeCloseTo(2.221, 2);
+    });
+});
+
+describe("Itération 4 - Coupons", () => {
+    beforeEach(() => {
+        cart.add(pomme, 1);
+    });
+
+    it("should apply percentage coupon", () => {
+        const coupon = {
+            code: "SAVE10",
+            type: "percentage" as const,
+            value: 10
+        };
+
+        cart.applyCoupon(coupon);
+        const totals = cart.calculateTotals();
+
+        expect(totals.discount).toBeCloseTo(0.10, 2);
+        expect(totals.total).toBeCloseTo(0.45, 2);
+    });
+
+    it("should apply fixed amount coupon", () => {
+        //Given
+        const coupon = {
+            code: "SAVE50",
+            type: "fixed" as const,
+            value: 0.15
+        };
+
+        //When
+        cart.applyCoupon(coupon);
+        const totals = cart.calculateTotals();
+
+        //Then
+        expect(totals.discount).toBe(0.15);
+        expect(totals.total).toBeCloseTo(0.35, 2);
+    });
+
+    it("should not apply expired coupon", () => {
+        //Given
+        const expiredCoupon = {
+            code: "EXPIRED",
+            type: "percentage" as const,
+            value: 10,
+            expiresAt: new Date("2020-01-01")
+        };
+
+        //When
+        cart.applyCoupon(expiredCoupon);
+        const totals = cart.calculateTotals();
+
+        //Then
+        expect(totals.discount).toBe(0);
+    });
+
+    it("should not apply coupon if minimum amount not met", () => {
+        //Given
+        cart.add(poire, 1);
+
+        const coupon = {
+            code: "BIG50",
+            type: "fixed" as const,
+            value: 5,
+            minAmount: 100
+        };
+
+        //When
+        cart.applyCoupon(coupon);
+        const totals = cart.calculateTotals();
+
+        //Then
+        expect(totals.discount).toBe(0);
     });
 });
