@@ -1,12 +1,21 @@
+import {calculateVAT} from "./utils/vatUtils";
+
 export type Product = {
     name: string,
     price: number,
+    vatRate: number,
 }
 
 export type CartItem = {
     product: Product,
     price: number,
     quantity: number,
+}
+
+export interface CartTotals {
+    subtotal: number;
+    vat: number;
+    total: number;
 }
 
 export class Cart {
@@ -48,6 +57,28 @@ export class Cart {
         if (!item) throw new Error("Product not found in cart");
 
         this.items.delete(productName);
+    }
+
+    calculateTotals(): CartTotals {
+        const items = this.getItems();
+        let subtotal = 0;
+        let vat = 0;
+
+        for (const item of items) {
+            const itemSubtotal = item.product.price * item.quantity;
+            const itemVat = calculateVAT(itemSubtotal, item.product.vatRate);
+
+            subtotal += itemSubtotal;
+            vat += itemVat;
+        }
+
+        const total = subtotal + vat;
+
+        return {
+            subtotal: Math.round(subtotal * 100) / 100,
+            vat: Math.round(vat * 100) / 100,
+            total: Math.round(total * 100) / 100
+        };
     }
 
     getItems(): CartItem[] {
