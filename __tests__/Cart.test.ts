@@ -1,6 +1,14 @@
-import {Cart} from "../src/Cart";
+import {Cart, Product} from "../src/Cart";
 
-test("test", () => {
+const pomme: Product = {
+    name: 'Pomme',
+    price: 0.50,
+};
+
+const poire: Product = {
+    name: 'Poire',
+    price: 0.80,
+};
     let cart: Cart;
 
     beforeEach(() => {
@@ -14,21 +22,21 @@ test("test", () => {
         });
 
         it("should add a product to cart", () => {
-            cart.add("pomme", 2, 1.5);
+            cart.add(pomme, 2);
 
             expect(cart.isEmpty()).toBe(false);
             expect(cart.getItemsCount()).toBe(2);
 
             const items = cart.getItems();
             expect(items).toHaveLength(1);
-            expect(items[0].product).toBe("pomme");
+            expect(items[0].product.name).toBe("Pomme");
             expect(items[0].quantity).toBe(2);
         });
 
         it("should increase quantity when adding same product", () => {
-            cart.add("pomme", 1, 1.5);
+            cart.add(pomme, 1);
 
-            cart.add("pomme", 2, 1.5);
+            cart.add(pomme, 2);
 
             expect(cart.getItemsCount()).toBe(3);
             const items = cart.getItems();
@@ -36,8 +44,7 @@ test("test", () => {
         });
 
         it("should throw error for invalid quantity", () => {
-            expect(() => cart.add("poire", 0, 1.5)).toThrow("Quantity must be positive");
-            expect(() => cart.add("poire", -1, 1.5)).toThrow("Quantity must be positive");
+            expect(() => cart.add(poire, 0)).toThrow("Quantity must be positive");
+            expect(() => cart.add(poire, -5)).toThrow("Quantity must be positive");
         });
-    });
-})
+    })
